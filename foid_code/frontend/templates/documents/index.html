@@ -1,0 +1,101 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %} | Dokümalar {% endblock %}
+
+{% block content %}
+
+<br>
+      {% include "partials/_alerts.html"%}
+<div class="d-flex justify-content-center">
+        <div class="col-md-10">
+        <div>
+            <table id="documentTable" class="table table-striped table-sm table-bordered" cellspacing="0">
+                <thead>
+                <tr>
+                    <th>Doküman Adı</th>
+                    <th>Son Aranan Sorgu</th>
+                    <th>Son Arama Tarihi</th>
+                    {% if user.is_admin %}
+                    <th>Arama Yapan</th>
+                    {% endif %}
+                    <th> <a title="Yeni Arama" class="btn btn-primary btn-sm float-right" href="{% url 'documents_search' %}"><i class="fas fa-plus"></i> Yeni Arama</a>
+                    </th>
+                </tr></thead>
+                <tbody>
+                {% for item in documents %}
+                <tr>
+                    <td>{{item.name}}</td>
+                    <td>{{item.query}}</td>
+                    <td>{{item.modified_date}}</td>
+                    {% if user.is_admin %}
+                    <td>
+                        {% if item.user %}
+                            {{ item.user }}
+                        {% else %}
+                            Anonim
+                        {% endif %}</td>
+                    {% endif %}
+                    <td class="float-right">
+                        <a title="Yeni Arama" class="btn btn-sm mt-1 btn-primary" href="{% url 'documents_searchById' item.id %}"><i class="fas fa-plus"></i></a>
+                        <a title="Arama Detayları" class="btn btn-sm mt-1 btn-info" href="{% url 'documents_detail' item.id %}"><i class="fas fa-info-circle"></i></a>
+                        <a title="Arama Sil"class="open-document-popup btn btn-sm mt-1 btn-danger" data-popup-url="{% url 'documents_delete' item.id %}" href="{% url 'documents_delete' item.id %}"><i class="fas fa-trash-alt"></i></a>
+                        <a title="Dokümanı Göster" class="btn btn-sm mt-1 btn-success" href="http://localhost:8080/document/{{item.docID.hex}}" target="_blank"><i class="fas fa-file-pdf"></i></a>
+                    </td>     
+                </tr>
+                {% endfor %}
+            </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+{% include "documents/popup.html" %}
+
+<script type="text/javascript">
+    $(function() {
+        $( document ).ready(function() {
+            var index = $('#documentTable').find('th:last').index();
+            $('#documentTable').DataTable( {
+                "language": {
+                    "lengthMenu": "Göster _MENU_",
+                    "info": "_TOTAL_ kayıttan _START_ ile _END_ arası gösteriliyor",
+                    "zeroRecords": "Kayıt Bulunamadı",
+                    "infoEmpty": "",
+                    "infoFiltered": "(toplam _MAX_ kayıttan filtrelendi)",
+                    "search": "Ara",
+                    "paginate": {
+                        "next": "Sonraki",
+                        "previous": "Önceki"
+                    }
+                },
+                "aLengthMenu": [[5,10,25, 50, 75, 100, -1], [5,10,25, 50, 75, 100, "Hepsi"]],
+                "iDisplayLength": 10,
+                "order": [[index, 'desc']]
+            } );
+            document.getElementById("deleteDocumentHeader").style.display= 'none';
+            document.getElementById("deleteSearchHistoryHeader").style.display= 'none';
+        });
+        $(document).on("click", ".open-document-popup", function (e) {
+            e.preventDefault();
+            var $popup = $("#documentPopup");
+            var popup_url = $(this).data("popup-url");
+            if(popup_url.indexOf('delete') != -1) {
+                document.getElementById("deleteDocumentHeader").style.display= '';
+            }
+            $(".modal-body", $popup).load(popup_url, function () {
+                $popup.modal("show");
+            });
+        });
+        $("#documentPopup").on("hidden.bs.modal", function () {
+            document.getElementById("deleteDocumentHeader").style.display= 'none';
+            document.getElementById("deleteSearchHistoryHeader").style.display= 'none';
+        });    
+    });
+  </script>
+
+{% endblock%}
+
+
+
+

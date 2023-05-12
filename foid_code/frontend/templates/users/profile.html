@@ -1,0 +1,65 @@
+<form action="{% url 'profile' %}" enctype="multipart/form-data" method="POST">
+    {% csrf_token %}
+    <div class="form-group">
+        <label for="first_name">Adı</label>
+        <span style="float:right;">
+            {{form.first_name}}
+        </span>
+    </div>
+    <div class="form-group">
+        <label for="last_name">Soyadı</label>
+        <span style="float:right;">
+            {{form.last_name}}
+        </span>
+    </div>
+    <div class="form-group">
+        <label for="username">Kullanıcı adı</label>
+        <span style="float:right;">
+            {{form.username}}
+        </span>
+    </div>
+    <div class="form-group">
+        <label for="email">Email</label>
+        <span style="float:right;">
+            {{form.email}}
+        </span>
+    </div>
+    {% if user.is_admin %}
+    <div class="form-group">
+        <label for="isAdmin">Yönetici mi?</label>
+        <span style="float:right;">
+            {{form.is_admin}}
+        </span>
+    </div>
+    {% endif %}
+    <div class="form-group">
+        <div id="changePassword" class="form-group">
+            <label for="isAdmin">Şifre Sıfırla</label>
+            <input type="checkbox" style="float: right;" name="change_password" id="profileChangePassword">
+        </div>
+    <div id="profilePasswordField" style="display:none">
+        <div class="form-group">
+            <label for="password">Yeni Şifre</label>
+            <span style="float:right;">
+                {{form.new_password}}
+            </span>
+        </div>
+        <div class="form-group">
+            <label for="confirm_password">Yeni Şifre Tekrar</label>
+            <span style="float:right;">
+                {{form.confirm_new_password}}
+            </span>
+        </div>
+    </div>
+
+    <div class="form-group">
+        <input type="submit" value="Kaydet" class="btn ml-2 btn-primary float-right">
+</form>
+
+<script type="text/javascript">
+    $(function() {
+        $('#profileChangePassword').click(function() {
+            $("#profilePasswordField").toggle(this.checked);
+        }); 
+    });
+</script>

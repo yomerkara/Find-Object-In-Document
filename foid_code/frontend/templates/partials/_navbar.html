@@ -1,0 +1,88 @@
+{% load static %}
+
+<nav style="background-color: #10284e;" class="navbar py-0 shadow-sm navbar-expand-md navbar-dark sticky-top">
+    <div class="container">
+        <a class="navbar-brand" href="/">
+            <img src="{% static 'assets/img/logo.png' %}" width="145" height="40" alt="foid"/>
+        </a>
+        <button
+                class="navbar-toggler"
+                type="button"
+                data-toggle="collapse"
+                data-target="#navbarNavAltMarkup"
+        >
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+            <ul class="navbar-nav">
+                {% if user.is_authenticated %}
+                {% if user.is_admin %}
+                <li class="nav-item active mr-3">
+                    <a class="nav-link" href="{% url 'user_index' %}"><i class="fas fa-users"></i> Kullanıcılar</a>
+                </li>
+                <li class="nav-item active mr-3">
+                    <a class="nav-link" href="{% url 'object_index' %}"><i class="fas fa-box-open"></i> Nesneler</a>
+                </li>
+                {% endif %}
+                <li class="nav-item active mr-3">
+                    <a class="nav-link" href="{% url 'documents_index' %}"><i class="fas fa-folder-open"></i> Dokümanlar</a>
+                </li>
+                {% endif %}
+                <li class="nav-item active mr-3">
+                    <a class="nav-link" href="{% url 'about' %}"><i class="fas fa-info-circle"></i> Hakkımızda</a>
+                </li>
+            </ul>
+
+            </ul>
+            <ul class="navbar-nav ml-auto">
+                {% if user.is_authenticated %}
+                <li class="nav-item active mr-3">
+                    {% if user.is_admin %}
+                    <a title="Profil" class="open-navbar-popup nav-link" data-popup-url="{% url 'profile' %}" href="{% url 'profile' %}">
+                        <i class="fas fa-user-circle"></i> {{user.first_name}} {{user.last_name}} (yönetici) </a>
+                    {% else %}
+                    <a title="Profil" class="open-navbar-popup nav-link" data-popup-url="{% url 'profile' %}" href="{% url 'profile' %}">
+                        <i class="fas fa-user-circle"></i> {{user.first_name}} {{user.last_name}}</a>
+                    {% endif %}
+                </li>
+                <li class="nav-item active mr-3">
+                    <a title="Çıkış" href="javascript:{document.getElementById('logout').submit()}" class="nav-link"><i class="fas fa-sign-out-alt"></i></a>
+                    <form action="{% url 'logout' %}" method="POST" id="logout">
+                        {% csrf_token %}
+                        <input type="hidden">
+                    </form>
+                </li>
+                {% else %}
+                <li class="nav-item active mr-3">
+                    <a class="nav-link" href="{% url 'login' %}"><i class="fas fa-sign-in-alt"></i></a>
+                </li>
+                {% endif %}
+            </ul>
+        </div>
+    </div>
+</nav>
+{% include "partials/_popup.html" %}
+<script src="{% static 'assets/js/jquery-3.3.1.min.js' %} "></script>
+
+
+<script type="text/javascript">
+    $(function() {
+        $( document ).ready(function() {
+            document.getElementById("profileUserHeader").style.display= 'none';
+        });
+        $(document).on("click", ".open-navbar-popup", function (e) {
+            e.preventDefault();
+            var $popup = $("#navbarPopup");
+            var popup_url = $(this).data("popup-url");
+            if(popup_url.indexOf('profile') != -1) {
+                document.getElementById("profileUserHeader").style.display= '';
+            }
+            $(".modal-body", $popup).load(popup_url, function () {
+                $popup.modal("show");
+            });
+        });
+        $("#navbarPopup").on("hidden.bs.modal", function () {
+            document.getElementById("profileUserHeader").style.display= 'none';
+        });
+    });
+</script>
